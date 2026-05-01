@@ -22,14 +22,17 @@ def get_product_list(last_id, client_id, seller_token):
             Предоставляется при регистрации приложения.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Выдается в личном кабинете Ozon.
+    
     Returns:
         dict: Словарь с данными о товарах, содержащий ключи:
             - "items" (list): Список товаров в текущей порции.
             - "total" (int): Общее количество товаров, соответствующих фильтру.
             - "last_id" (str): Идентификатор последнего товара для следующего запроса.
+    
     Raises:
         requests.exceptions.HTTPError: Если API вернул код ошибки (4xx, 5xx).
         KeyError: Если структура ответа API не соответствует ожидаемой.
+    
     Example:
         >>> # Получение первой порции товаров
         >>> result = get_product_list("", "12345", "token123")
@@ -66,13 +69,16 @@ def get_offer_ids(client_id, seller_token):
             Выдается при регистрации приложения в личном кабинете.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Предоставляется в разделе API настроек магазина.
+    
     Returns:
         list: Список строк, содержащих артикулы (offer_id) всех товаров магазина.
             Пример: ["123456", "789012", "345678"]
+    
     Raises:
         requests.exceptions.HTTPError: Если API Ozon вернул ошибку авторизации
             или другой код ошибки (4xx, 5xx).
         KeyError: Если структура ответа API изменилась и не содержит ожидаемых ключей.
+    
     Example:
         >>> # Получение всех артикулов для последующего обновления
         >>> offer_ids = get_offer_ids("12345", "token123")
@@ -111,6 +117,7 @@ def update_price(prices: list, client_id, seller_token):
             Выдается при регистрации приложения.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Предоставляется в личном кабинете Ozon.
+    
     Returns:
         dict: Ответ API Ozon, содержащий результат обновления цен.
             Обычная структура ответа:
@@ -118,9 +125,11 @@ def update_price(prices: list, client_id, seller_token):
                 "result": list,     # Список обработанных товаров
                 "errors": list      # Список ошибок валидации (если есть)
             }
+    
     Raises:
         requests.exceptions.HTTPError: Если API вернул ошибку (4xx, 5xx).
         ValueError: Если prices не является списком или содержит некорректные данные.
+    
     Example:
         >>> # Подготовка данных для обновления цен
         >>> prices_to_update = [
@@ -169,11 +178,14 @@ def update_stocks(stocks: list, client_id, seller_token):
             Выдается при регистрации приложения в личном кабинете.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Предоставляется в разделе API настроек магазина.
+    
     Returns:
         dict: Ответ API Ozon с результатом обработки запроса.
+    
     Raises:
         requests.exceptions.HTTPError: Если API вернул ошибку HTTP.
         ValueError: Если stocks не является списком или содержит некорректные данные.
+    
     Example:
         >>> # Обновление остатков нескольких товаров
         >>> stocks_to_update = [
@@ -204,11 +216,13 @@ def download_stock():
     Returns:
         list[dict]: Список словарей, где каждый словарь представляет одну позицию товара.
             Каждый словарь содержит ключи, соответствующие колонкам Excel-файла.
+    
     Raises:
         requests.exceptions.HTTPError: Если файл недоступен по указанному URL
             (404 - не найден, 403 - доступ запрещен, 500 - ошибка сервера).
         zipfile.BadZipFile: Если скачанный файл не является валидным ZIP-архивом
             (поврежден, неверный формат, пустой файл).
+    
     Examples:
         >>> remainders = download_stock()
         >>> print(f"Загружено товаров: {len(remainders)}")
@@ -252,8 +266,10 @@ def create_stocks(watch_remnants, offer_ids):
         offer_ids (list): Список артикулов товаров, загруженных в магазин Ozon.
             Обычно получается из функции get_offer_ids(). Содержит строковые
             значения артикулов.
+    
     Returns:
         list[dict]: Список словарей с остатками для отправки в API Ozon.
+    
     Examples:
         >>> create_stocks([{'Код': '001', 'Количество': '10'}], ['001'])
         [{'offer_id': '001', 'stock': 10}]
@@ -290,8 +306,10 @@ def create_prices(watch_remnants, offer_ids):
         offer_ids (list): Список артикулов товаров, загруженных в магазин Ozon.
             Обычно получается из функции get_offer_ids(). Содержит строковые
             значения артикулов.
+    
     Returns:
         list[dict]: Список словарей с ценами для отправки в API Ozon.
+    
     Examples:
         >>> create_prices([{'Код': '001', 'Цена': "5'990.00 руб."}], ['001'])
         [{'offer_id': '001', 'price': 5990, 'currency_code': 'RUB'}]
@@ -319,10 +337,13 @@ def price_conversion(price: str) -> str:
 
     Args:
         price (str): Цена в формате поставщика. Пример: "5'990.00 руб."
+    
     Returns:
         str: Цена в виде строки, содержащей только цифры. Пример: "5990"
+    
     Raises:
         AttributeError: Если аргумент price не является строкой.
+    
     Examples:
         >>> price_conversion("5'990.00 руб.")
         '5990'
@@ -346,12 +367,15 @@ def divide(lst: list, n: int):
             Может содержать элементы любого типа.
         n (int): Размер одной части (количество элементов в подсписке).
             Должен быть положительным целым числом (n > 0).
+    
     Yields:
         list: Следующая часть исходного списка, содержащая не более n элементов.
             Последняя часть может быть меньше n, если длина списка не кратна n.
+    
     Raises:
         TypeError: Если lst не является списком или n не является целым числом.
         ValueError: Если n <= 0.
+    
     Examples:
         >>> # Разделение списка чисел на части по 3
         >>> numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -385,13 +409,16 @@ async def upload_prices(watch_remnants, client_id, seller_token):
             Выдается при регистрации приложения в личном кабинете.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Предоставляется в разделе API настроек магазина.
+    
     Returns:
         list[dict]: Список словарей с ценами, которые были отправлены в API Ozon.
+   
     Raises:
         requests.exceptions.HTTPError: Если API Ozon вернул ошибку при обновлении цен
             (неверный формат, проблемы авторизации, превышение лимитов).
         KeyError: Если в watch_remnants отсутствуют обязательные ключи ("Код", "Цена").
         ValueError: Если prices не является списком или содержит некорректные данные.
+    
     Examples:
         >>> await upload_prices([{'Код': '001', 'Цена': "5'990.00 руб."}], '123', 'token123')
         [{'offer_id': '001', 'price': 5990}]
@@ -422,15 +449,18 @@ async def upload_stocks(watch_remnants, client_id, seller_token):
             Выдается при регистрации приложения в личном кабинете.
         seller_token (str): API-ключ продавца для авторизации запросов.
             Предоставляется в разделе API настроек магазина.
+    
     Returns:
         tuple: Кортеж из двух элементов:
             - not_empty (list[dict]): Список товаров с ненулевым остатком (stock > 0)
             - stocks (list[dict]): Полный список всех обновленных остатков
+    
     Raises:
         requests.exceptions.HTTPError: Если API Ozon вернул ошибку при обновлении остатков
             (неверный формат, проблемы авторизации, превышение лимитов).
         KeyError: Если в watch_remnants отсутствуют обязательные ключи ("Код", "Количество").
         ValueError: Если stocks не является списком или содержит некорректные данные.
+    
     Examples:
         >>> await upload_stocks([{'Код': '001', 'Количество': '10'}], '123', 'token123')
         ([{'offer_id': '001', 'stock': 10}], [{'offer_id': '001', 'stock': 10}])
